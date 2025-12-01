@@ -50,9 +50,9 @@ if GEMINI_API_KEY:
     ]
 
     # Smart Model (Complex Tasks)
-    model = genai.GenerativeModel('gemini-3-pro-preview', safety_settings=SAFETY_SETTINGS) 
+    model = genai.GenerativeModel('gemini-1.5-flash', safety_settings=SAFETY_SETTINGS) 
     # Fast Model (Routing & Simple Tasks)
-    fast_model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025', safety_settings=SAFETY_SETTINGS)
+    fast_model = genai.GenerativeModel('gemini-1.5-flash', safety_settings=SAFETY_SETTINGS)
 else:
     model = None
     fast_model = None
@@ -298,7 +298,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # Start chat with history
             fast_model_with_sys = genai.GenerativeModel(
-                'gemini-2.5-flash-preview-09-2025',
+                'gemini-1.5-flash',
                 system_instruction=fast_sys
             )
             fast_chat = fast_model_with_sys.start_chat(history=fast_history)
@@ -320,7 +320,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Re-init model with system prompt for this turn
         model_with_sys = genai.GenerativeModel(
-            'gemini-3-pro-preview',
+            'gemini-1.5-flash',
             system_instruction=get_system_prompt(),
             safety_settings=SAFETY_SETTINGS
         )
@@ -455,7 +455,7 @@ async def handle_multimodal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # 3. Generate Response
         model_with_sys = genai.GenerativeModel(
-            'gemini-3-pro-preview', # Changed from 'gemini-3.0-pro' to 'gemini-3-pro-preview'
+            'gemini-1.5-flash', # Changed from 'gemini-3.0-pro' to 'gemini-3-pro-preview'
             system_instruction=get_system_prompt(),
             safety_settings=SAFETY_SETTINGS
         )

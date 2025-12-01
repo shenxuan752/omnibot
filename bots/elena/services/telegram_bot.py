@@ -16,9 +16,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     # Smart Model (Complex Tasks & Vision)
-    model = genai.GenerativeModel('gemini-3-pro-preview') 
+    model = genai.GenerativeModel('gemini-1.5-flash') 
     # Fast Model (Routing & Simple Tasks)
-    fast_model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
+    fast_model = genai.GenerativeModel('gemini-1.5-flash')
 else:
     model = None
     fast_model = None
@@ -170,7 +170,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             fast_sys = "You are Coach Elena. Be encouraging, concise, and firm. Reply to this simple message."
             
             fast_model_with_sys = genai.GenerativeModel(
-                'gemini-2.5-flash-preview-09-2025',
+                'gemini-1.5-flash',
                 system_instruction=fast_sys
             )
             fast_chat = fast_model_with_sys.start_chat(history=fast_history)
@@ -186,7 +186,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         history = await db.get_recent_context(user_id, limit=500)
         
         model_with_sys = genai.GenerativeModel(
-            'gemini-3-pro-preview',
+            'gemini-1.5-flash',
             system_instruction=get_system_prompt()
         )
         
@@ -267,7 +267,7 @@ async def handle_multimodal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         history = await db.get_recent_context(user_id, limit=500)
         
         model_with_sys = genai.GenerativeModel(
-            'gemini-3-pro-preview',
+            'gemini-1.5-flash',
             system_instruction=get_system_prompt()
         )
         

@@ -7,10 +7,10 @@ load_dotenv()
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 # Fast model for simple tasks (word lookup, WOD)
-model_fast = genai.GenerativeModel('gemini-2.5-flash')
+model_fast = genai.GenerativeModel('gemini-1.5-flash')
 
 # High-quality model for complex tasks (voice analysis, shadowing)
-model = genai.GenerativeModel('gemini-3-pro-preview')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 async def lookup_word(word: str) -> dict:
     """Look up a word and get definition, Chinese translation, and example."""
