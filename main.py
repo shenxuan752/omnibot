@@ -5,86 +5,96 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+import asyncio
+import os
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger("omnibot")
+# Import Bot Applications
+from bots.elena.services.telegram_bot import application as elena_app
+from bots.alex.services.telegram_bot import application as alex_app
+from bots.athena.services.telegram_bot import application as athena_app
+from bots.zeus.services.telegram_bot import application as zeus_app
+from bots.english_coach.bot import application as english_coach_app, restore_jobs
 
-app = FastAPI(title="OmniBot Super Server")
-
+# Import Scheduler
 from scheduler import start_master_scheduler
 
-# Import Bot Webhook Handlers
-from bots.elena.services.telegram_bot import process_telegram_update as elena_handler
-from bots.alex.services.telegram_bot import process_telegram_update as alex_handler
-from bots.athena.services.telegram_bot import process_telegram_update as athena_handler
-from bots.zeus.services.telegram_bot import process_telegram_update as zeus_handler
-from bots.english_coach.bot import process_telegram_update as english_coach_handler
+# Configure Logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
-@app.on_event("startup")
-async def startup_event():
-    """Start background tasks."""
-    logger.info("Starting up OmniBot...")
-    import asyncio
+# --- Polling Management ---
+async def start_polling_bot(app, name):
+    """Initialize and start polling for a bot application."""
+    if not app:
+        logger.warning(f"{name} application is None. Skipping.")
+        return
+
+    logger.info(f"Starting {name} in Polling Mode...")
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling(drop_pending_updates=True)
+    logger.info(f"{name} started successfully.")
+
+async def stop_polling_bot(app, name):
+    """Stop a bot application."""
+    if not app: return
+    logger.info(f"Stopping {name}...")
+    await app.updater.stop()
+    await app.stop()
+    await app.shutdown()
+
+# --- Lifecycle Manager ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage startup and shutdown of bots."""
+    logger.info("🚀 Starting OmniBot (Polling Mode)...")
+    
+    # 1. Start Scheduler
     asyncio.create_task(start_master_scheduler())
+    
+    # 2. Start English Coach Jobs (Special Case)
+    if english_coach_app:
+        await english_coach_app.initialize()
+        await english_coach_app.start()
+        await restore_jobs(english_coach_app)
+        await english_coach_app.updater.start_polling(drop_pending_updates=True)
+        logger.info("English Coach started with JobQueue.")
+
+    # 3. Start Other Bots
+    await start_polling_bot(elena_app, "Elena")
+    await start_polling_bot(alex_app, "Alex")
+    await start_polling_bot(athena_app, "Athena")
+    await start_polling_bot(zeus_app, "Zeus")
+    
+    yield
+    
+    # Shutdown
+    logger.info("🛑 Shutting down OmniBot...")
+    await stop_polling_bot(english_coach_app, "English Coach")
+    await stop_polling_bot(elena_app, "Elena")
+    await stop_polling_bot(alex_app, "Alex")
+    await stop_polling_bot(athena_app, "Athena")
+    await stop_polling_bot(zeus_app, "Zeus")
+
+# --- FastAPI App (For UptimeRobot) ---
+app = FastAPI(lifespan=lifespan)
+
+# Serve FluentAI Frontend (Optional, but good to keep)
+if os.path.exists("fluentai---american-accent-coach/dist"):
+    app.mount("/fluentai", StaticFiles(directory="fluentai---american-accent-coach/dist", html=True), name="fluentai")
 
 @app.get("/")
 async def health_check():
-    return {"status": "ok", "message": "OmniBot is running"}
+    """Health check endpoint for UptimeRobot."""
+    return {"status": "alive", "mode": "polling"}
 
-from fastapi.staticfiles import StaticFiles
-
-# Serve FluentAI static files
-fluentai_dist = "fluentai---american-accent-coach/dist"
-if os.path.exists(fluentai_dist):
-    app.mount("/fluentai", StaticFiles(directory=fluentai_dist, html=True), name="fluentai")
-else:
-    logger.warning(f"FluentAI dist directory not found at {fluentai_dist}. Skipping mount.")
-
-# --- Webhook Routes ---
-
-@app.post("/webhook/elena")
-async def elena_webhook(request: Request):
-    data = await request.json()
-    await elena_handler(data)
-    return {"status": "ok"}
-
-@app.post("/webhook/alex")
-async def alex_webhook(request: Request):
-    data = await request.json()
-    await alex_handler(data)
-    return {"status": "ok"}
-
-@app.post("/webhook/athena")
-async def athena_webhook(request: Request):
-    data = await request.json()
-    await athena_handler(data)
-    return {"status": "ok"}
-
-@app.post("/webhook/zeus")
-async def zeus_webhook(request: Request):
-    data = await request.json()
-    await zeus_handler(data)
-    return {"status": "ok"}
-
-@app.post("/webhook/english_coach")
-async def english_coach_webhook(request: Request):
-    data = await request.json()
-    await english_coach_handler(data)
-    return {"status": "ok"}
-
-# News Bot (Broadcast only, but we can add a trigger if needed)
-# @app.post("/webhook/news")
-# async def news_webhook(request: Request):
-#     return {"status": "ignored", "reason": "broadcast_only"}
-
-@app.post("/webhook/{bot_name}")
-async def generic_webhook(bot_name: str, request: Request):
-    """
-    Fallback for unknown bots.
-    """
-    logger.warning(f"Received webhook for unknown bot: {bot_name}")
-    return {"status": "unknown_bot", "bot": bot_name}
+@app.get("/health")
+async def health_check_alias():
+    return {"status": "alive", "mode": "polling"}
