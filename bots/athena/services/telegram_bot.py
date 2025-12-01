@@ -17,7 +17,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 else:
     model = None
 
@@ -172,7 +172,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         gemini_history.append({"role": role, "parts": [content]})
     
     try:
-        model_with_sys = genai.GenerativeModel('gemini-1.5-flash', system_instruction=get_system_prompt())
+        model_with_sys = genai.GenerativeModel('gemini-2.5-flash', system_instruction=get_system_prompt())
         chat = model_with_sys.start_chat(history=gemini_history)
         response = chat.send_message(text)
         reply_text = response.text
