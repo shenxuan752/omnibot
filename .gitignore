@@ -1,0 +1,23 @@
+# Environment Variables (CRITICAL: Do not remove)
+.env
+.env.local
+.env.*
+! .env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Mac
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-dotenv
+python-telegram-bot[job-queue]
+google-generativeai
+twilio
+supabase
+gTTS
+edge-tts
+websockets
+pytz
+requests
