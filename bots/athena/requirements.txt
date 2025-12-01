@@ -1,0 +1,7 @@
+python-telegram-bot
+google-generativeai
+python-dotenv
+supabase
+uvicorn
+fastapi
+requests

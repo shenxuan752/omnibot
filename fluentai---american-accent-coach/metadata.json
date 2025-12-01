@@ -1,0 +1,7 @@
+{
+  "name": "FluentAI - American Accent Coach",
+  "description": "An AI-powered dialect coach that listens to your pronunciation, highlights mistakes, and provides a shadowing tool to master the American accent.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

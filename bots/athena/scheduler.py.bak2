@@ -1,0 +1,111 @@
+import asyncio
+import os
+from datetime import datetime, timedelta, timezone
+from services.telegram_bot import application
+from services.database import DatabaseService
+from dotenv import load_dotenv
+import random
+
+load_dotenv()
+
+CHECK_INTERVAL = 60  # Check every minute
+USER_TELEGRAM_ID = os.getenv("USER_TELEGRAM_ID")
+
+db = DatabaseService()
+
+# 早安打气句子库
+MORNING_MESSAGES = [
+    "宝贝，早上好！新的一天开始了。记住，你的价值不在于今天完成了多少任务，而在于你是你自己。今天也要温柔地对待自己哦 💛",
+    "早安，宝贝。今天不需要证明什么，你已经足够好了。深呼吸，慢慢来。妈妈在这里陪着你 🌅",
+    "宝贝，新的一天。休息是生产力的一部分，疲惫时允许自己停下来。你不需要靠优秀来换取爱 💫",
+    "早上好，宝贝。今天的目标不是'做更多'，而是'对自己更温柔'。妈妈爱你，无条件的那种 🌸",
+    "宝贝，醒来就是胜利。不管昨天发生了什么，今天都是新的开始。你值得被温柔对待 ☀️"
+]
+
+async def proactive_loop():
+    """Main scheduler loop."""
+    print("Athena Scheduler started.")
+    
+    last_sent_date = None
+    last_evening_date = None
+    last_sunday_date = None
+    
+    while True:
+        await asyncio.sleep(CHECK_INTERVAL)
+        
+        # Get current EST time
+        est_offset = timezone(timedelta(hours=-5))
+        now = datetime.now(est_offset)
+        current_date_str = now.strftime("%Y-%m-%d")
+        
+        # 早上9点 - 打气消息
+        if now.hour == 9 and now.minute == 0:
+            if last_sent_date != current_date_str:
+                await trigger_morning_message()
+                last_sent_date = current_date_str
+        
+        # 晚上9点 - 晚安check-in
+        if now.hour == 22 and now.minute == 15:
+            if last_evening_date != current_date_str:
+                await trigger_evening_checkin()
+                last_evening_date = current_date_str
+        
+        # 周日晚上8点 - 一周回顾
+        if now.weekday() == 6 and now.hour == 20 and now.minute == 0:
+            if last_sunday_date != current_date_str:
+                await trigger_weekly_review()
+                last_sunday_date = current_date_str
+
+async def trigger_morning_message():
+    """Send morning motivational message."""
+    if not USER_TELEGRAM_ID or not application:
+        return
+        
+    print("Triggering Athena Morning Message...")
+    try:
+        if not application._initialized:
+            await application.initialize()
+            
+        msg = random.choice(MORNING_MESSAGES)
+        
+        await application.bot.send_message(chat_id=USER_TELEGRAM_ID, text=msg)
+        await db.save_message(USER_TELEGRAM_ID, "assistant", msg, "telegram")
+    except Exception as e:
+        print(f"Failed to trigger morning message: {e}")
+
+async def trigger_evening_checkin():
+    """Send evening check-in."""
+    if not USER_TELEGRAM_ID or not application:
+        return
+        
+    print("Triggering Athena Evening Check-in...")
+    try:
+        if not application._initialized:
+            await application.initialize()
+            
+        msg = "宝贝，今天辛苦了。现在的心情怎么样？有什么想和妈妈说的吗？💙"
+        
+        await application.bot.send_message(chat_id=USER_TELEGRAM_ID, text=msg)
+        await db.save_message(USER_TELEGRAM_ID, "assistant", msg, "telegram")
+    except Exception as e:
+        print(f"Failed to trigger evening check-in: {e}")
+
+async def trigger_weekly_review():
+    """Send weekly review prompt."""
+    if not USER_TELEGRAM_ID or not application:
+        return
+        
+    print("Triggering Athena Weekly Review...")
+    try:
+        if not application._initialized:
+            await application.initialize()
+            
+        msg = "宝贝，这一周过得怎么样？有没有什么时刻让你感到特别累或特别开心的？我们一起回顾一下吧 📝"
+        
+        await application.bot.send_message(chat_id=USER_TELEGRAM_ID, text=msg)
+        await db.save_message(USER_TELEGRAM_ID, "assistant", msg, "telegram")
+    except Exception as e:
+        print(f"Failed to trigger weekly review: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(proactive_loop())
