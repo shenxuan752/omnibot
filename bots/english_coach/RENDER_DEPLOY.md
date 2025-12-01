@@ -34,7 +34,7 @@ git push -u origin main
 
 5. **Environment Variables** (Click "Advanced" or "Environment"):
    Add these keys and values:
-   - `TELEGRAM_BOT_TOKEN`: `8339590058:AAHaNbGK9JmtrC2fuOsoiMIfK7L-q4B92No`
+   - `TELEGRAM_BOT_TOKEN`: `YOUR_TELEGRAM_BOT_TOKEN`
    - `GEMINI_API_KEY`: `YOUR_GEMINI_API_KEY`
    - `SUPABASE_URL`: `https://ewqchootxeeizzhmqdks.supabase.co`
    - `SUPABASE_KEY`: `YOUR_SUPABASE_KEY`
