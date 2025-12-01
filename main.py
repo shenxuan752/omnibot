@@ -28,7 +28,8 @@ from bots.english_coach.bot import process_telegram_update as english_coach_hand
 async def startup_event():
     """Start background tasks."""
     logger.info("Starting up OmniBot...")
-    await start_master_scheduler()
+    import asyncio
+    asyncio.create_task(start_master_scheduler())
 
 @app.get("/")
 async def health_check():
