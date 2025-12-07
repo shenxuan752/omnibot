@@ -2,7 +2,7 @@ import asyncio
 import random
 import os
 from datetime import datetime, timedelta, timezone
-from .services.twilio_voice import make_outbound_call
+# from .services.twilio_voice import make_outbound_call  # VOICE DISABLED
 from .services.telegram_bot import application
 from .services.database import DatabaseService
 from dotenv import load_dotenv
@@ -66,9 +66,10 @@ async def proactive_loop():
         prob = random.random()
         print(f"Scheduler tick: {prob:.4f}")
         
-        if prob > CALL_THRESHOLD:
-            await trigger_call()
-        elif prob > TEXT_THRESHOLD:
+        # Voice calls disabled
+        # if prob > CALL_THRESHOLD:
+        #     await trigger_call()
+        if prob > TEXT_THRESHOLD:
             await trigger_text()
 
 async def check_and_send_scheduled_messages():

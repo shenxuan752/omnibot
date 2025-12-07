@@ -1,37 +1,38 @@
+```python
 import os
-import requests
+import asyncio
+from telegram import Bot
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# Render URL (update this to your actual Render URL)
 RENDER_URL = "https://omnibot-648d.onrender.com"
 
-bots = [
-    ("ELENA_TELEGRAM_BOT_TOKEN", "elena"),
-    ("ALEX_TELEGRAM_BOT_TOKEN", "alex"),
-    ("ATHENA_TELEGRAM_BOT_TOKEN", "athena"),
-    ("ZEUS_TELEGRAM_BOT_TOKEN", "zeus"),
-    ("ENGLISH_COACH_TELEGRAM_BOT_TOKEN", "english_coach"),
-]
+# Bot configurations (ONLY ACTIVE BOTS)
+BOTS = {
+    "Elena": os.getenv("ELENA_TELEGRAM_BOT_TOKEN"),
+    "Alex": os.getenv("ALEX_TELEGRAM_BOT_TOKEN"),
+    "English Coach": os.getenv("TELEGRAM_BOT_TOKEN"),
+}
 
-print(f"Updating webhooks to: {RENDER_URL}...\n")
-
-for token_var, path in bots:
-    token = os.getenv(token_var)
-    if not token:
-        print(f"❌ Missing token for {path} ({token_var})")
-        continue
+async def update_webhooks():
+    for bot_name, token in BOTS.items():
+        if not token:
+            print(f"⚠️  {bot_name}: Token not found, skipping...")
+            continue
         
-    webhook_url = f"{RENDER_URL}/webhook/{path}"
-    api_url = f"https://api.telegram.org/bot{token}/setWebhook?url={webhook_url}"
-    
-    try:
-        response = requests.get(api_url)
-        if response.status_code == 200 and response.json().get("ok"):
-            print(f"✅ {path.capitalize()}: Webhook updated successfully!")
-        else:
-            print(f"❌ {path.capitalize()}: Failed! {response.text}")
-    except Exception as e:
-        print(f"❌ {path.capitalize()}: Error {e}")
+        bot = Bot(token=token)
+        webhook_path = bot_name.lower().replace(" ", "_")
+        webhook_url = f"{RENDER_URL}/webhook/{webhook_path}"
+        
+        try:
+            await bot.set_webhook(url=webhook_url)
+            info = await bot.get_webhook_info()
+            print(f"✅ {bot_name}: Webhook set to {info.url}")
+        except Exception as e:
+            print(f"❌ {bot_name}: Error - {e}")
 
-print("\nDone!")
+if __name__ == "__main__":
+    asyncio.run(update_webhooks())
+```
