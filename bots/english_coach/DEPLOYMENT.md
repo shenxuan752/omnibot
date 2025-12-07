@@ -38,7 +38,7 @@ gcloud services enable cloudbuild.googleapis.com
 ### 4. Set Environment Variables in Google Cloud
 ```bash
 # Create secrets for sensitive data
-echo "8339590058:AAHaNbGK9JmtrC2fuOsoiMIfK7L-q4B92No" | gcloud secrets create telegram-bot-token --data-file=-
+echo "YOUR_TELEGRAM_BOT_TOKEN" | gcloud secrets create telegram-bot-token --data-file=-
 echo "YOUR_GEMINI_API_KEY" | gcloud secrets create gemini-api-key --data-file=-
 echo "https://ewqchootxeeizzhmqdks.supabase.co" | gcloud secrets create supabase-url --data-file=-
 echo "YOUR_SUPABASE_KEY" | gcloud secrets create supabase-key --data-file=-
@@ -52,7 +52,7 @@ gcloud run deploy english-coach-bot \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars TELEGRAM_BOT_TOKEN=8339590058:AAHaNbGK9JmtrC2fuOsoiMIfK7L-q4B92No,GEMINI_API_KEY=YOUR_GEMINI_API_KEY,SUPABASE_URL=https://ewqchootxeeizzhmqdks.supabase.co,SUPABASE_KEY=YOUR_SUPABASE_KEY \
+  --set-env-vars TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN,GEMINI_API_KEY=YOUR_GEMINI_API_KEY,SUPABASE_URL=YOUR_SUPABASE_URL,SUPABASE_KEY=YOUR_SUPABASE_KEY \
   --min-instances 1 \
   --max-instances 1 \
   --memory 512Mi \

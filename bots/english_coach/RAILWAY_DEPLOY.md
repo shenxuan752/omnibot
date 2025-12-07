@@ -36,7 +36,7 @@
 
 4. **Set Environment Variables**
    ```bash
-   railway variables set TELEGRAM_BOT_TOKEN=8339590058:AAHaNbGK9JmtrC2fuOsoiMIfK7L-q4B92No
+   railway variables set TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
    railway variables set GEMINI_API_KEY=YOUR_GEMINI_API_KEY
    railway variables set SUPABASE_URL=https://ewqchootxeeizzhmqdks.supabase.co
    railway variables set SUPABASE_KEY=YOUR_SUPABASE_KEY
