@@ -12,7 +12,7 @@ RENDER_URL = "https://omnibot-dec2025.onrender.com"
 BOTS = {
     "Elena": os.getenv("ELENA_TELEGRAM_BOT_TOKEN"),
     "Alex": os.getenv("ALEX_TELEGRAM_BOT_TOKEN"),
-    "English Coach": os.getenv("TELEGRAM_BOT_TOKEN"),
+    "English Coach": os.getenv("ENGLISH_COACH_TELEGRAM_BOT_TOKEN"),
 }
 
 async def update_webhooks():
