@@ -2,8 +2,8 @@ import asyncio
 import logging
 from bots.elena.scheduler import proactive_loop as elena_loop
 from bots.alex.scheduler import proactive_loop as alex_loop
-from bots.athena.scheduler import proactive_loop as athena_loop
-from bots.zeus.scheduler import proactive_loop as zeus_loop
+# from bots.athena.scheduler import proactive_loop as athena_loop  # DISABLED
+# from bots.zeus.scheduler import proactive_loop as zeus_loop  # DISABLED
 from bots.news.scheduler import scheduler_loop as news_loop
 # English Coach uses PTB JobQueue, which runs with the Application.
 # We need to ensure the Application is started.
@@ -22,8 +22,8 @@ async def start_master_scheduler():
     # Start independent loops
     asyncio.create_task(elena_loop())
     asyncio.create_task(alex_loop())
-    asyncio.create_task(athena_loop())
-    asyncio.create_task(zeus_loop())
+    # asyncio.create_task(athena_loop())  # DISABLED
+    # asyncio.create_task(zeus_loop())  # DISABLED
     asyncio.create_task(news_loop())
     
     # Start English Coach JobQueue

@@ -1,4 +1,3 @@
-```python
 import os
 import asyncio
 from telegram import Bot
@@ -7,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Render URL (update this to your actual Render URL)
-RENDER_URL = "https://omnibot-648d.onrender.com"
+RENDER_URL = "https://omnibot-dec2025.onrender.com"
 
 # Bot configurations (ONLY ACTIVE BOTS)
 BOTS = {
@@ -35,4 +34,3 @@ async def update_webhooks():
 
 if __name__ == "__main__":
     asyncio.run(update_webhooks())
-```
