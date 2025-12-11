@@ -20,8 +20,8 @@ async def start_master_scheduler():
     logger.info("Starting OmniBot Master Scheduler...")
     
     # Start independent loops
-    asyncio.create_task(elena_loop())
-    asyncio.create_task(alex_loop())
+    # asyncio.create_task(elena_loop())  # DISABLED - User requested
+    # asyncio.create_task(alex_loop())  # DISABLED - User requested
     # asyncio.create_task(athena_loop())  # DISABLED
     # asyncio.create_task(zeus_loop())  # DISABLED
     asyncio.create_task(news_loop())
